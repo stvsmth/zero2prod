@@ -1,4 +1,6 @@
+use sqlx::{Connection, PgConnection};
 use std::net::TcpListener;
+use zero2prod::configuration::get_configuration;
 
 #[tokio::test]
 async fn health_check_works() {
@@ -61,6 +63,12 @@ async fn subscribe_returns_400_when_data_is_missing() {
 async fn subscribe_returns_200_for_valid_form_data() {
     // Arrange
     let app_address = spawn_app();
+    let config = get_configuration().expect("Failed to read config");
+    let conn_string = config.database.connection_string();
+    let mut conn = PgConnection::connect(&conn_string)
+        .await
+        .expect("Failed to connect to Postgres");
+
     let client = reqwest::Client::new();
 
     // Act
@@ -75,4 +83,12 @@ async fn subscribe_returns_200_for_valid_form_data() {
 
     // Assert
     assert_eq!(200, response.status().as_u16());
+
+    let saved = sqlx::query!("SELECT email, name FROM subscriptions",)
+        .fetch_one(&mut conn)
+        .await
+        .expect("Failed to fetch saved subscription");
+
+    assert_eq!(saved.email, "urusla_le_guin@gmail.com");
+    assert_eq!(saved.name, "le guin");
 }
