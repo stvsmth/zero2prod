@@ -38,7 +38,7 @@ pub async fn subscribe(form: web::Form<FormData>, conn_pool: web::Data<PgPool>) 
         form.name,
         Utc::now()
     )
-    .execute(conn_pool.get_ref())
+    .execute(conn_pool.as_ref())
     .instrument(query_span)
     .await
     {
