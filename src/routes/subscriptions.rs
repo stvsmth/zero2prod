@@ -1,5 +1,4 @@
 use actix_web::{web, HttpResponse};
-use chrono::Utc;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -38,15 +37,15 @@ pub async fn subscribe(form: web::Form<FormData>, conn_pool: web::Data<PgPool>) 
 
 #[tracing::instrument(name = "Saving new subscriber to the database", skip(form, conn_pool))]
 pub async fn insert_subscriber(conn_pool: &PgPool, form: &FormData) -> Result<(), sqlx::Error> {
+    // NOTE: to avoid a vulnerability in `chrono` crate, I've added a default value to subscribed_at at DB level
     sqlx::query!(
         r#"
-        INSERT INTO subscriptions (id, email, name, subscribed_at)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO subscriptions (id, email, name)
+        VALUES ($1, $2, $3)
         "#,
         Uuid::new_v4(),
         form.email,
         form.name,
-        Utc::now()
     )
     .execute(conn_pool)
     .await
