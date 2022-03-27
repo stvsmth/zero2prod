@@ -30,6 +30,7 @@ default-features = false
 features = [
     "macros",
     "migrate",
+    "offline",
     "postgres",
     "runtime-actix-rustls",
     "uuid",
