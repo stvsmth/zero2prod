@@ -153,11 +153,13 @@ async fn subscribe_returns_a_400_when_fields_are_present_but_invalid() {
 
     for (body, description) in test_cases {
         // Act
-        let response = client.post(&format!("{}/subscriptions", &app.address))
-        .header("Content-Type", "application/x-www-form-urlencoded")
-        .body(body)
-        .send()
-        .await.expect("Failed to execute request.");
+        let response = client
+            .post(&format!("{}/subscriptions", &app.address))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .body(body)
+            .send()
+            .await
+            .expect("Failed to execute request.");
 
         // Assert
         assert_eq!(
