@@ -23,6 +23,18 @@ pub struct TestApp {
     pub conn_pool: PgPool,
 }
 
+impl TestApp {
+    pub async fn post_subscriptions(&self, body: String) -> reqwest::Response {
+        reqwest::Client::new()
+            .post(&format!("{}/subscriptions", &self.address))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .body(body)
+            .send()
+            .await
+            .expect("Failed to execute the request")
+    }
+}
+
 #[tokio::test]
 async fn health_check_works() {
     // Arrange
